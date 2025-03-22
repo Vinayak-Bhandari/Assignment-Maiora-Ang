@@ -1,0 +1,129 @@
+<nav class="navbar">
+    <div class="container">
+        <div class="desktop-nav">
+            <i style="cursor: pointer;font-size: large;" class="fas fa-home" (click)="showProductDetails = false"></i>
+            <span (click)="showProductDetails = false">Burger Queen</span>
+            <div class="cart-badge" [attr.data-count]="cartCount" (click)="toggleCart()">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container" *ngIf="!showProductDetails">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search burgers..." [(ngModel)]="searchQuery"
+            (input)="onSearch()">
+    </div>
+
+    <div class="product-grid" *ngIf="filteredProducts.length > 0">
+        <div class="product-card" *ngFor="let product of filteredProducts" (click)="showDetails(product)">
+            <img [src]="product.image" [alt]="product.name" class="product-image">
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p>₹{{ product.price }}</p>
+                <button class="add-to-cart-btn" (click)="addToCart(product); $event.stopPropagation()">
+                    Add to Cart
+                    <span *ngIf="getItemCount(product.id)">({{ getItemCount(product.id) }})</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="no-results" *ngIf="filteredProducts.length === 0">
+        <h2>No burgers found matching your search</h2>
+        <p>Try a different search term</p>
+    </div>
+</div>
+
+<div class="container" *ngIf="showProductDetails && selectedProduct">
+    <div class="product-details">
+        <div class="product-details-header">
+            <img [src]="selectedProduct.image" [alt]="selectedProduct.name" class="product-details-image">
+            <div class="product-details-info">
+                <h1>{{ selectedProduct.name }}</h1>
+                <div class="product-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <span style="color: #666; margin-left: 0.5rem">(4.5)</span>
+                </div>
+                <h2>₹{{ selectedProduct.price }}</h2>
+                <div class="stock-status">
+                    <i class="fas fa-check-circle"></i>
+                    <span>In Stock</span>
+                </div>
+                <p class="product-description">{{ selectedProduct.description }}</p>
+                <button class="add-to-cart-btn" style="max-width: 200px" (click)="addToCart(selectedProduct)">
+                    Add to Cart
+                    <span *ngIf="getItemCount(selectedProduct.id)">({{ getItemCount(selectedProduct.id) }})</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="related-products">
+            <h2>Related Products</h2>
+            <div class="related-products-grid">
+                <div class="product-card" *ngFor="let product of getRelatedProducts()" (click)="showDetails(product)">
+                    <img [src]="product.image" [alt]="product.name" class="product-image">
+                    <div class="product-info">
+                        <h3>{{ product.name }}</h3>
+                        <p>₹{{ product.price }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <i class="fas fa-home" (click)="showProductDetails = false"></i>
+    <i class="fas fa-th-large"></i>
+    <i class="fa-solid fa-compass"></i>
+    <div class="cart-badge" [attr.data-count]="cartCount" (click)="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+    <i class="fas fa-user"></i>
+</div>
+
+
+<div class="cart-modal" *ngIf="showCart">
+    <div class="cart-items">
+        <div class="cart-header">
+            <h3> Cart</h3>
+            <hr />
+            <button class="close-btn" (click)="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div *ngFor="let item of cartItems">
+            <div class="cart-item">
+                <img [src]="item.image" [alt]="item.name">
+                <div class="item-details">
+                    <div class="item-header">
+                        <h4>{{ item.name }}</h4>
+                        <button class="remove-btn" (click)="removeFromCart(item.id)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <p>₹{{ item.price }}</p>
+                    <div class="quantity-controls">
+                        <button (click)="updateQuantity(item.id, item.quantity - 1)">-</button>
+                        <span>{{ item.quantity }}</span>
+                        <button (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cart-summary" *ngIf="cartItems.length">
+            <p style="margin-bottom: 6px;">Subtotal <span>₹{{ getTotal() }}.00</span></p>
+            <p>Discount <span> ₹56.00</span></p>
+            <hr />
+            <p class="total">Total <span>₹{{ getTotal() - 56 }}.00</span></p>
+            <button class="buy-now-btn" (click)="buyNow()">Buy Now</button>
+        </div>
+    </div>
+</div>
